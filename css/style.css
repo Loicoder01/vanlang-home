@@ -37,6 +37,7 @@
   --line-faint:   rgba(201, 162, 77, 0.12);
 
   /* Type */
+  --font-vi: "Be Vietnam Pro", "Segoe UI", sans-serif;
   --font-display: "Crimson Text", "Noto Serif", serif;
   --font-title:   "Cinzel", "Be Vietnam Pro", serif;
   --font-body:    "Be Vietnam Pro", "Segoe UI", sans-serif;
@@ -649,8 +650,8 @@ a:focus-visible, button:focus-visible {
   padding: 40px 44px;
   background: radial-gradient(ellipse 80% 100% at 0% 0%, rgba(46,68,53,.35), transparent 60%), var(--bg-panel);
 }
-.play-copy h2 {
-  font-family: var(--font-title); font-weight: 800;
+.play-copy h2 { font-family: var(--font-vi);
+  font-family: var(--font-vi); font-weight: 800;
   font-size: clamp(26px, 4vw, 34px); line-height: 1.15;
   color: var(--gold-pale); margin-bottom: 10px;
 }
@@ -1042,3 +1043,6 @@ body[data-auth="guest"] .auth-only-play{display:none !important}
 .chat-input{display:flex;gap:8px;margin-top:10px}
 .chat-input input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg-deep);color:var(--text)}
 @media (max-width: 900px){.community-layout{grid-template-columns:1fr}.chat-channels{flex-direction:row;overflow:auto}}
+
+/* Vietnamese diacritics fix: headings with Ặ/Đ/Ơ use Be Vietnam Pro to avoid Cinzel fallback mojibake */
+.play-copy h2 .accent{font-family:var(--font-vi)}
