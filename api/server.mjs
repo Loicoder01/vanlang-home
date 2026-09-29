@@ -51,6 +51,33 @@ app.post('/auth/logout', (req,res)=>{
   res.json({ ok:true });
 });
 
+// PHA 22 — launch ticket: in-memory (staging), TTL 45s, single-use, no DB migration
+import crypto from 'crypto';
+const tickets = new Map(); // ticket -> {account_id, expiresAt}
+function issueTicket(account_id){
+  const ticket = crypto.randomBytes(32).toString('base64url');
+  const expiresAt = Date.now() + 45_000;
+  tickets.set(ticket, { account_id, expiresAt });
+  setTimeout(()=> tickets.delete(ticket), 50_000);
+  return { ticket, expiresAt };
+}
+
+app.get('/auth/launch-ticket', (req,res)=>{
+  const id = req.cookies?.vanlang_session;
+  if(!id) return res.status(401).json({ error:'UNAUTHORIZED' });
+  const t = issueTicket(String(id));
+  res.json({ ticket: t.ticket, expiresAt: t.expiresAt, account_id: String(id) });
+});
+app.post('/auth/verify-ticket', (req,res)=>{
+  const { ticket } = req.body || {};
+  if(!ticket) return res.status(400).json({ error:'VALIDATION_ERROR' });
+  const rec = tickets.get(String(ticket));
+  if(!rec) return res.status(401).json({ error:'INVALID_TICKET' });
+  if(Date.now() > rec.expiresAt){ tickets.delete(String(ticket)); return res.status(401).json({ error:'EXPIRED' }); }
+  tickets.delete(String(ticket));
+  res.json({ ok:true, account_id: rec.account_id });
+});
+
 app.get('/auth/me', (req,res)=>{
   const id = req.cookies?.vanlang_session;
   if(!id) return res.status(401).json({ error:'UNAUTHORIZED' });
