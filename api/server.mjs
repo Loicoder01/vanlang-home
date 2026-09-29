@@ -29,6 +29,37 @@ app.use(cors({ origin(origin, cb){
 
 app.use(rateLimit({ windowMs: 60_000, max: 20, standardHeaders:true, legacyHeaders:false }));
 
+// PHA 23 — Profile + Rankings read-only (mock, no DB migration yet)
+// Khi DATA_MODE=api và có VANLANG_DB_*, sẽ đọc v1_character/v1_account read-only (SELECT only)
+app.get('/api/profile', (req,res)=>{
+  const id = req.cookies?.vanlang_session;
+  if(!id) return res.status(401).json({ error:'UNAUTHORIZED' });
+  // Mock: trả account + main character demo
+  const acc = [...mockAccounts.values()].find(a=>String(a.id)===String(id));
+  if(!acc) return res.status(401).json({ error:'UNAUTHORIZED' });
+  res.json({
+    account_id: acc.id, username: acc.username,
+    characters: [
+      { charId:'char_axe_1', name:'Lạc Vệ Phong', level:35, classId:'axe', power:4820, rank:128 },
+      { charId:'char_bow_1', name:'Vân Ưng', level:28, classId:'bow', power:3610, rank:412 },
+    ],
+    _note: 'DEMO DATA — read-only, sẽ lấy từ v1_character khi DATA_MODE=api'
+  });
+});
+app.get('/api/rankings', (req,res)=>{
+  const tab = req.query.tab || 'topLevel';
+  const mock = {
+    topLevel: [
+      {rank:1,name:'Hùng Vương',className:'Lạc Vệ',level:50,value:50},
+      {rank:2,name:'Sơn Tinh',className:'Trúc Vệ',level:48,value:48},
+      {rank:3,name:'Vân Ưng',className:'Lạc Vũ',level:47,value:47},
+      {rank:4,name:'Lạc Long',className:'Lạc Vệ',level:45,value:45},
+      {rank:5,name:'Âu Cơ',className:'Lạc Vũ',level:44,value:44},
+    ]
+  };
+  res.json({ tab, items: mock.topLevel||[], _note:'DEMO DATA' });
+});
+
 app.get('/health', (req,res)=> res.json({ ok:true, dataMode: DATA_MODE }));
 
 app.post('/auth/login', (req,res)=>{
