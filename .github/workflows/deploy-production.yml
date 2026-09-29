@@ -1,0 +1,82 @@
+# vanlang-home — NORMAL UI deploy
+# NORMAL DEPLOY: chỉ rsync + nginx -t + reload. KHÔNG chạy certbot, KHÔNG ghi đè nginx config/SSL.
+# Sửa Nginx/SSL dùng script riêng: scripts/setup-nginx.sh
+name: Deploy Homepage (trangchu.vanlang.biz)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vanlang-home-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate HTML/CSS/JS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check JS syntax
+        run: |
+          node --check js/config.js
+          node --check js/main.js
+          node --check js/atlas.js
+          echo "JS syntax OK"
+
+      - name: Check required files
+        run: |
+          test -f index.html || (echo "Missing index.html" && exit 1)
+          test -f css/style.css || (echo "Missing css/style.css" && exit 1)
+          test -f js/config.js || (echo "Missing js/config.js" && exit 1)
+          echo "Required files OK"
+
+      - name: Check GAME_URL single source
+        run: |
+          grep -q "https://game.vanlang.biz" js/config.js || (echo "GAME_URL must be https://game.vanlang.biz in js/config.js" && exit 1)
+          echo "GAME_URL OK"
+
+      - name: Check branding text
+        run: |
+          grep -q "ABEO MEDIA" index.html || (echo "Missing ABEO MEDIA in index.html" && exit 1)
+          grep -q "VĂN LANG" index.html || (echo "Missing VĂN LANG in index.html" && exit 1)
+          echo "Branding OK"
+
+      - name: Check shell scripts
+        run: |
+          bash -n scripts/deploy.sh
+          bash -n scripts/rollback.sh || true
+          echo "Shell syntax OK"
+
+  deploy:
+    name: Deploy to VPS
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VANLANG_VPS_SSH_KEY }}" > ~/.ssh/vanlang_vps_ed25519
+          chmod 600 ~/.ssh/vanlang_vps_ed25519
+          ssh-keyscan -H "${{ secrets.VANLANG_VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Deploy (rsync + nginx -t + reload + healthcheck + rollback)
+        env:
+          VPS_HOST: ${{ secrets.VANLANG_VPS_HOST }}
+          VPS_USER: ${{ secrets.VANLANG_VPS_USER }}
+          VPS_PORT: ${{ secrets.VANLANG_VPS_PORT }}
+        run: bash scripts/deploy.sh
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Deploy workflow finished. Check logs above for PASS/FAIL/ROLLBACK."

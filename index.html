@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,14 +46,15 @@
         </span>
       </span>
     </a>
-    <nav class="nav" id="navMain" aria-label="Chính">
+        <nav class="nav" id="navMain" aria-label="Chính">
+      <a href="#hero">Trang chủ</a>
       <a href="#the-gioi">Giới thiệu</a>
-      <a href="#he-phai">Nhân vật</a>
+      <a href="#nhan-vat">Nhân vật</a>
       <a href="#ban-do">Thế giới</a>
       <a href="#tinh-nang">Tính năng</a>
       <a href="#tin-tuc">Tin tức</a>
       <a href="#huong-dan">Hướng dẫn</a>
-      <a href="#trai-nghiem">Trải nghiệm</a>
+      <a href="#cong-dong">Cộng đồng</a>
     </nav>
     <div class="topbar-actions">
       <span class="version-badge" id="versionBadge">V0.6</span>
@@ -63,14 +64,15 @@
       </button>
     </div>
   </div>
-  <div class="mobile-nav" id="mobileNav" hidden>
-    <a href="#the-gioi">Thế giới</a>
-    <a href="#he-phai">Hệ phái</a>
-    <a href="#vu-khi">Vũ khí</a>
-    <a href="#tuyet-ky">Tuyệt kỹ</a>
+    <div class="mobile-nav" id="mobileNav" hidden>
+    <a href="#hero">Trang chủ</a>
+    <a href="#the-gioi">Giới thiệu</a>
     <a href="#nhan-vat">Nhân vật</a>
-    <a href="#ban-do">Bản đồ</a>
-    <a href="#trai-nghiem">Trải nghiệm</a>
+    <a href="#ban-do">Thế giới</a>
+    <a href="#tinh-nang">Tính năng</a>
+    <a href="#tin-tuc">Tin tức</a>
+    <a href="#huong-dan">Hướng dẫn</a>
+    <a href="#cong-dong">Cộng đồng</a>
     <a class="btn btn-play" id="playBtnMobile" href="#" rel="noopener">CHƠI NGAY — MIỄN PHÍ</a>
   </div>
 </header>
@@ -107,7 +109,7 @@
         <span>MMORPG 2D · CHƠI TRÊN TRÌNH DUYỆT</span>
         <span class="eyebrow-line"></span>
       </div>
-      <img id="heroLogo" class="hero-logo-img" src="assets/brand/logo-vanlang.png" alt="VĂN LANG — HÀO KHÍ LẠC HỒNG" width="560" height="220" decoding="async" loading="eager" onerror="this.style.display='none';document.getElementById('hero').classList.remove('hero--with-logo')" onload="document.getElementById('hero').classList.add('hero--with-logo')">
+      <img id="heroLogo" class="hero-logo-img" src="assets/brand/logo-vanlang.png" alt="VĂN LANG — HÀO KHÍ LẠC HỒNG" width="560" height="220" decoding="async" loading="eager" onerror="this.style.display='none'">
       <h1 class="hero-title">
         <span class="hero-title-main">VĂN LANG</span>
         <span class="hero-title-sub">HÀO KHÍ LẠC HỒNG</span>
@@ -161,6 +163,24 @@
 
   <div class="hero-bottom-rule" aria-hidden="true"><span></span><i>◆</i><span></span></div>
 </section>
+
+
+<!-- ===== KHÁM PHÁ (compact) — thu gọn 7 hàng lớn thành dropdown) ===== -->
+<div class="explore-wrap" id="exploreWrap">
+  <div class="explore-bar">
+    <button class="explore-trigger" id="exploreTrigger" aria-expanded="false" aria-controls="explorePanel" aria-haspopup="true">KHÁM PHÁ <span aria-hidden="true">▼</span></button>
+  </div>
+  <div class="explore-panel" id="explorePanel" role="menu" hidden>
+    <a href="#the-gioi" role="menuitem">Thế giới</a>
+    <a href="#he-phai" role="menuitem">Hệ phái</a>
+    <a href="#vu-khi" role="menuitem">Vũ khí</a>
+    <a href="#tuyet-ky" role="menuitem">Tuyệt kỹ</a>
+    <a href="#nhan-vat" role="menuitem">Nhân vật</a>
+    <a href="#ban-do" role="menuitem">Bản đồ</a>
+    <a href="#trai-nghiem" role="menuitem">Trải nghiệm</a>
+  </div>
+</div>
+<div class="explore-overlay" id="exploreOverlay" hidden></div>
 
 <!-- ===== PLAY — KHÔNG CẦN CÀI ĐẶT ===== -->
 <section class="section section-play" id="play">
@@ -498,7 +518,7 @@
 <!-- ===== CTA ===== -->
 <section class="section section-cta" id="cta">
   <div class="container">
-    <div class="cta-box reveal">
+    <div class="cta-box cta-cinematic reveal">
       <div class="cta-copy">
         <h2>Vào Phong Châu ngay</h2>
         <p>Chọn hệ phái, đặt tên, bước qua cổng làng. Mọi tiến trình lưu trên server — đổi máy vẫn còn.</p>
@@ -545,7 +565,8 @@
         <span>© 2026 VĂN LANG. Bản quyền thuộc về ABEO MEDIA. All Rights Reserved.</span>
       </div>
     </div>
-    <div class="footer-seal" aria-label="ABEO MEDIA — Sản phẩm thuộc bản quyền"><img src="assets/brand/abeo-media-seal.png" alt="Sản phẩm thuộc bản quyền — ABEO MEDIA — All Rights Reserved" width="220" height="58" loading="lazy" onerror="this.style.display='none';document.getElementById('hero').classList.remove('hero--with-logo')" onload="document.getElementById('hero').classList.add('hero--with-logo')"></div>
+    <div class="footer-seal footer-seal--text" aria-label="ABEO MEDIA — Sản phẩm thuộc bản quyền"><span class="seal-mark" aria-hidden="true">A</span><span class="seal-text"><strong>ABEO MEDIA</strong><span>ALL RIGHTS RESERVED</span></span></div>
+    <div id="cong-dong" class="footer-community" aria-label="Cộng đồng"><p>Cộng đồng Văn Lang — Discord · Fanpage · Group đang chuẩn bị. Theo dõi mục Tin tức để không bỏ lỡ.</p></div>
     <div class="footer-bottom">
       <p>© 2026 VĂN LANG — Bản quyền thuộc về ABEO MEDIA. All Rights Reserved.<br>Trang chủ và game là hai project độc lập. Trang chủ không can thiệp GameSrc / server V0.6. Khi tag V0.6-STABLE được gắn, URL WebApp sẽ được cập nhật tự động.</p>
     </div>

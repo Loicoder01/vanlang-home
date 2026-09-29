@@ -280,6 +280,25 @@
     });
   }
 
+  function wireExploreMenu(){
+    var trigger=document.getElementById('exploreTrigger');
+    var panel=document.getElementById('explorePanel');
+    var overlay=document.getElementById('exploreOverlay');
+    if(!trigger||!panel) return;
+    function open(){panel.hidden=false; if(overlay) overlay.hidden=false; requestAnimationFrame(function(){panel.classList.add('is-open'); if(overlay) overlay.classList.add('is-open')}); trigger.setAttribute('aria-expanded','true')}
+    function close(){panel.classList.remove('is-open'); if(overlay) overlay.classList.remove('is-open'); trigger.setAttribute('aria-expanded','false'); setTimeout(function(){ if(!panel.classList.contains('is-open')) panel.hidden=true; if(overlay&&!overlay.classList.contains('is-open')) overlay.hidden=true},200)}
+    trigger.addEventListener('click', function(){ panel.classList.contains('is-open')?close():open()});
+    if(overlay) overlay.addEventListener('click', close);
+    panel.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(ev){ ev.preventDefault(); var target=document.querySelector(a.getAttribute('href')); if(target) target.scrollIntoView({behavior:'smooth',block:'start'}); history.replaceState(null,'',a.getAttribute('href')); close()})});
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') close()});
+    document.addEventListener('click', function(e){ if(!panel.contains(e.target)&&!trigger.contains(e.target)&&panel.classList.contains('is-open')) close()});
+    // scroll-spy highlight inside explore panel
+    var links=Array.from(panel.querySelectorAll('a'));
+    var map={}; links.forEach(function(a){ var id=a.getAttribute('href').slice(1); var sec=document.getElementById(id); if(sec) map[id]=a});
+    function spy(){ var pos=window.scrollY+window.innerHeight*0.35; var cur=null; Object.keys(map).forEach(function(id){ var sec=document.getElementById(id); if(sec&&sec.offsetTop<=pos) cur=id}); links.forEach(function(a){a.classList.remove('is-active')}); if(cur&&map[cur]) map[cur].classList.add('is-active')}
+    window.addEventListener('scroll', spy, {passive:true}); spy()
+  }
+  document.documentElement.classList.remove('no-js');
   document.addEventListener("DOMContentLoaded", function () {
     // brand logo fallback class
     var bl=document.getElementById('brandLogo'); if(bl){ bl.addEventListener('error', function(){ document.getElementById('brandWordmark').style.display='flex'; }); if(bl.complete && bl.naturalWidth===0) document.getElementById('brandWordmark').style.display='flex'; }
@@ -298,6 +317,7 @@
     loadPreviewShots();
     wireKeyboardTabs();
     wireSmoothScroll();
+    wireExploreMenu();
     wireMobileNav();
     wireTopbarScroll();
   });

@@ -7,3 +7,7 @@ dist/
 .env.*
 !.env.example
 .claude/
+# vanlang-home: ignore candidates and local overrides
+assets/brand/abeo-seal-candidate-*.png
+assets/brand/favicon-source*.png
+assets/brand/source/*.webp

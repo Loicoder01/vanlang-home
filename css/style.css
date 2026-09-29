@@ -926,3 +926,66 @@ a:focus-visible, button:focus-visible {
 /* When hero logo image loads, hide redundant H1 main but keep sub-lines */
 .hero--with-logo .hero-title-main{display:none}
 .hero--with-logo .hero-title-sub{margin-top:4px}
+
+/* Fallback: nếu JS không chạy, reveal tự hiện sau 1.8s (tránh invisible vĩnh viễn) */
+@media (prefers-reduced-motion: no-preference){
+  @keyframes reveal-fallback{to{opacity:1;transform:none}}
+  .reveal{animation:reveal-fallback .6s 1.8s both}
+  .reveal.is-visible{animation:none;opacity:1;transform:none}
+}
+/* Khi JS đã observe và thêm is-visible thì animation fallback bị override */
+
+/* Cinematic CTA — không full-width vàng phẳng */
+.section-cta .cta-box.cta-cinematic{max-width:860px;margin:0 auto}
+
+/* Desktop sweet spot: content không dàn quá rộng */
+@media (min-width: 961px) and (max-width: 1366px){
+  .container{max-width:1080px}
+}
+@media (min-width: 1367px){
+  .container{max-width:1200px}
+}
+
+/* footer-seal-fix: ensure clean background, not checkerboard */
+.footer-seal{background:transparent;border:none;padding:0}
+.footer-seal img{background:transparent}
+
+/* sprite-placeholder: khi atlas chưa load, khối vẫn giữ chỗ để không collapse thành text row */
+.sprite{min-height:40px}
+.weapon-sprite{min-height:80px}
+.hero-card-sprite{min-height:120px}
+.npc-sprite{min-height:90px}
+
+.mobile-nav[hidden]{display:none !important}
+
+/* Compact explore menu — replaces 7-row full-width block */
+.explore-bar{display:flex;justify-content:center;margin:18px 0 8px}
+.explore-trigger{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-body);font-weight:700;font-size:13px;letter-spacing:.08em;color:var(--gold);background:rgba(201,162,77,.08);border:1px solid var(--line);border-radius:2px;padding:8px 16px;cursor:pointer}
+.explore-trigger:hover{border-color:var(--gold);background:rgba(201,162,77,.14)}
+.explore-panel{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 8px);min-width:220px;background:var(--bg-panel);border:1px solid var(--line);border-radius:4px;padding:8px;box-shadow:0 12px 32px rgba(0,0,0,.45);display:none;z-index:20}
+.explore-panel.is-open{display:block}
+.explore-panel a{display:block;padding:9px 14px;font-size:13px;color:var(--text-dim);border-radius:2px}
+.explore-panel a:hover,.explore-panel a.is-active{background:rgba(201,162,77,.10);color:var(--gold)}
+.explore-wrap{position:relative}
+.explore-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:10}
+.explore-overlay.is-open{display:block}
+@media (max-width: 720px){
+  .explore-panel{position:fixed;left:12px;right:12px;transform:none;bottom:12px;top:auto;max-height:60vh;overflow:auto}
+}
+
+/* CTA narrow cinematic */
+.cta-narrow{max-width:980px;margin:0 auto}
+
+.footer-seal--text{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;border:1px solid var(--line-faint);border-radius:4px;background:rgba(201,162,77,.04);max-width:360px;margin:24px auto}
+.seal-mark{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--gold);color:#0D1410;font-weight:800;border-radius:2px}
+.seal-text{display:flex;flex-direction:column;line-height:1.1}
+.seal-text strong{font-size:12px;letter-spacing:.12em;color:var(--gold)}
+.seal-text span{font-size:10px;letter-spacing:.08em;color:var(--text-dim)}
+.footer{padding:40px 0 24px}
+.footer-bottom p{font-size:11px;opacity:.7}
+
+/* no-js-fallback: hiện panel đầu nếu JS chưa chạy (tránh text row rỗng) */
+.no-js .class-panel[hidden], .no-js .weapon-panel[hidden], .no-js .news-panel[hidden]{display:grid !important}
+.no-js .weapon-panel[hidden]{display:block !important}
+
+.footer-community{text-align:center;padding:14px 20px;font-size:13px;color:var(--text-dim);border-top:1px solid var(--line-faint);background:rgba(201,162,77,.04)}

@@ -1,9 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-# VAN LANG HOMEPAGE — 1-command deploy
+# VAN LANG HOMEPAGE — NORMAL UI DEPLOY (không chạm Nginx/SSL)
 # DÙNG: cd /Users/macos/Documents/vanlang/vanlang-home && chmod +x deploy-home.sh && ./deploy-home.sh
-# Chạy NGOÀI sandbox Claude, trên macOS Terminal. Không chạy trong sandbox.
+# Chạy NGOÀI sandbox Claude, trên macOS Terminal.
+# NORMAL DEPLOY chỉ: validate -> SSH -> backup -> rsync -> nginx -t -> reload -> test -> check game
+# KHÔNG chạy certbot, KHÔNG copy nginx/trangchu.conf, KHÔNG sửa sites-available/sites-enabled/SSL.
+# Sửa Nginx/SSL dùng script riêng: repair-nginx.sh / setup-nginx.sh
 
 HOME_URL="https://trangchu.vanlang.biz"
 GAME_URL="https://game.vanlang.biz"
@@ -19,10 +22,9 @@ SSH="ssh -i $SSH_KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -
 BACKUP_PATH=""
 NGINX_RESULT="FAIL"
 HTTP_RESULT="FAIL"
-HTTPS_RESULT="NOT CONFIGURED"
+HTTPS_RESULT="UNKNOWN"
 BRANDING_RESULT="WARNING"
 GAME_SVC_RESULT="WARNING"
-CERT_STATUS="NOT CONFIGURED"
 
 # colors
 C_RED='\033[0;31m'; C_GRN='\033[0;32m'; C_YEL='\033[0;33m'; C_CYN='\033[0;36m'; C_NC='\033[0m'
@@ -33,11 +35,11 @@ warn()  { printf "${C_YEL}WARN${C_NC} %s\n" "$1"; }
 fail()  { printf "${C_RED}FAIL${C_NC} %s\n" "$1"; }
 
 # ============================================================
-# [1/10] Local check
+# [1/8] Local check
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[1/10] Local check"
+echo "[1/8] Local check"
 echo "============================================================"
 
 die() { printf "${C_RED}ERROR:${C_NC} %s\n" "$1"; exit 1; }
@@ -45,7 +47,8 @@ die() { printf "${C_RED}ERROR:${C_NC} %s\n" "$1"; exit 1; }
 [ -d "$SOURCE_DIR" ]       || die "SOURCE_DIR missing: $SOURCE_DIR"
 [ -f "$SOURCE_DIR/index.html" ]           || die "Missing: $SOURCE_DIR/index.html"
 [ -f "$SOURCE_DIR/js/config.js" ]         || die "Missing: $SOURCE_DIR/js/config.js"
-[ -f "$SOURCE_DIR/nginx/trangchu.conf" ]  || die "Missing: $SOURCE_DIR/nginx/trangchu.conf"
+# nginx/trangchu.conf is not required for NORMAL deploy (kept locally, not uploaded). Sửa Nginx/SSL dùng repair-nginx.sh
+[ -f "$SOURCE_DIR/index.html" ] || die "Missing index.html (sanity)"
 [ -f "$SSH_KEY" ]          || die "SSH key missing: $SSH_KEY"
 
 # GAME_URL must be https://game.vanlang.biz in config
@@ -80,11 +83,11 @@ fi
 ok "Local check passed"
 
 # ============================================================
-# [2/10] SSH
+# [2/8] SSH
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[2/10] SSH"
+echo "[2/8] SSH"
 echo "============================================================"
 
 if ! $SSH "echo SSH_OK" 2>&1 | grep -q "SSH_OK"; then
@@ -96,11 +99,11 @@ fi
 ok "SSH to ${VPS_USER}@${VPS} OK"
 
 # ============================================================
-# [3/10] VPS audit
+# [3/8] VPS audit
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[3/10] VPS audit"
+echo "[3/8] VPS audit"
 echo "============================================================"
 
 $SSH bash -s <<'AUDIT'
@@ -119,11 +122,11 @@ AUDIT
 ok "VPS audit printed (no changes made)"
 
 # ============================================================
-# [4/10] Nginx backup
+# [4/8] Nginx backup (an toàn)
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[4/10] Nginx backup"
+echo "[4/8] Nginx backup (an toàn)"
 echo "============================================================"
 
 BACKUP_PATH=$($SSH bash -s <<'EOS'
@@ -146,11 +149,11 @@ BACKUP_PATH=$(echo "$BACKUP_PATH" | tail -1 | tr -d '\r' | xargs)
 echo "  Backup: $BACKUP_PATH"
 
 # ============================================================
-# [5/10] Upload homepage
+# [5/8] Upload homepage -> /opt/vanlang-home
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[5/10] Upload homepage"
+echo "[5/8] Upload homepage -> /opt/vanlang-home"
 echo "============================================================"
 
 $SSH "sudo mkdir -p $PROD_DIR && sudo chown -R ${VPS_USER}:${VPS_USER} $PROD_DIR"
@@ -171,35 +174,13 @@ rsync -az --delete \
 
 ok "rsync -> ${VPS_USER}@${VPS}:${PROD_DIR}/"
 
+
 # ============================================================
-# [6/10] Install Nginx config
+# [6/8] Nginx test (nginx -t) + reload
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[6/10] Install Nginx config"
-echo "============================================================"
-
-# upload to /tmp then sudo move
-scp -i "$SSH_KEY" -o IdentitiesOnly=yes \
-  "$SOURCE_DIR/nginx/trangchu.conf" \
-  "${VPS_USER}@${VPS}:/tmp/vanlang-trangchu.conf"
-
-$SSH bash -s <<'EOS'
-set -e
-sudo cp /tmp/vanlang-trangchu.conf /etc/nginx/sites-available/trangchu
-sudo ln -sfn /etc/nginx/sites-available/trangchu /etc/nginx/sites-enabled/trangchu
-# do not touch other sites-enabled entries
-echo "Installed: /etc/nginx/sites-available/trangchu"
-ls -l /etc/nginx/sites-enabled/ 2>&1 | head -20
-EOS
-ok "Nginx site trangchu installed (other sites untouched)"
-
-# ============================================================
-# [7/10] Nginx test
-# ============================================================
-echo ""
-echo "============================================================"
-echo "[7/10] Nginx test"
+echo "[6/8] Nginx test (nginx -t) + reload"
 echo "============================================================"
 
 set +e
@@ -221,103 +202,15 @@ $SSH "sudo systemctl reload nginx"
 ok "nginx reloaded (no restart)"
 
 # ============================================================
-# [8/10] SSL
+# [7/8] Production QA
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[8/10] SSL"
+echo "[7/8] Production QA"
 echo "============================================================"
 
-CERT_STATUS=$($SSH bash -s <<'EOS'
-set +e
-if ! command -v certbot >/dev/null 2>&1; then
-  echo "CERTBOT_NOT_FOUND"
-  exit 0
-fi
-# list certs (non-fatal)
-sudo certbot certificates 2>&1 | head -40 || true
-# check if trangchu already has cert
-if sudo certbot certificates 2>&1 | grep -q "trangchu.vanlang.biz"; then
-  echo "CERT_EXISTS"
-  exit 0
-fi
-echo "CERT_MISSING"
-EOS
-)
-
-CERT_STATUS=$(echo "$CERT_STATUS" | tail -1 | tr -d '\r' | xargs)
-
-if echo "$CERT_STATUS" | grep -q "CERTBOT_NOT_FOUND"; then
-  warn "Certbot not installed — HTTPS skipped (HTTP will work)"
-  HTTPS_RESULT="NOT CONFIGURED"
-elif echo "$CERT_STATUS" | grep -q "CERT_EXISTS"; then
-  ok "Cert already exists for trangchu.vanlang.biz"
-  HTTPS_RESULT="PASS"
-  CERT_STATUS="CERT_EXISTS"
-else
-  # try to obtain cert — need to handle email requirement
-  info "8/10" "Attempting certbot for trangchu.vanlang.biz ..."
-  set +e
-  # check if account already exists
-  HAS_ACCOUNT=$($SSH "sudo ls /etc/letsencrypt/accounts 2>/dev/null | head -1" | tr -d '\r' | xargs)
-  set -e
-  if [ -z "$HAS_ACCOUNT" ]; then
-    # no account — certbot --register-unsafely-without-email may be allowed, else requires email
-    # try without email first; if it demands email, we skip
-    set +e
-    CERTBOT_OUT=$($SSH "sudo certbot --nginx -d trangchu.vanlang.biz --non-interactive --agree-tos --redirect --register-unsafely-without-email 2>&1" | tail -30)
-    CERTBOT_EXIT=$?
-    set -e
-    if [ $CERTBOT_EXIT -ne 0 ]; then
-      # check if error mentions email
-      if echo "$CERTBOT_OUT" | grep -qi "email"; then
-        echo ""
-        warn "CERTBOT_EMAIL_REQUIRED — no Let's Encrypt account yet and certbot requires --email"
-        warn "  Create manually: sudo certbot --nginx -d trangchu.vanlang.biz --email you@example.com --agree-tos --redirect"
-        warn "  HTTP remains working; not rolling back."
-        HTTPS_RESULT="NOT CONFIGURED"
-      else
-        echo "$CERTBOT_OUT"
-        warn "Certbot failed (non-email reason) — see output above. HTTP remains working."
-        HTTPS_RESULT="FAIL"
-      fi
-    else
-      ok "Certbot succeeded (no-email registration)"
-      HTTPS_RESULT="PASS"
-      # reload after certbot modifies nginx
-      $SSH "sudo nginx -t && sudo systemctl reload nginx" || true
-    fi
-  else
-    # account exists — can run without email
-    set +e
-    CERTBOT_OUT=$($SSH "sudo certbot --nginx -d trangchu.vanlang.biz --non-interactive --agree-tos --redirect 2>&1" | tail -30)
-    CERTBOT_EXIT=$?
-    set -e
-    if [ $CERTBOT_EXIT -ne 0 ]; then
-      echo "$CERTBOT_OUT"
-      warn "Certbot failed — see output above. HTTP remains working."
-      HTTPS_RESULT="FAIL"
-    else
-      ok "Certbot succeeded"
-      HTTPS_RESULT="PASS"
-      $SSH "sudo nginx -t && sudo systemctl reload nginx" || true
-    fi
-  fi
-fi
-
-# ============================================================
-# [9/10] Production QA
-# ============================================================
-echo ""
-echo "============================================================"
-echo "[9/10] Production QA"
-echo "============================================================"
-
-# determine which scheme to test (prefer https if we have it)
-QA_URL="http://trangchu.vanlang.biz/"
-if [ "$HTTPS_RESULT" = "PASS" ]; then
-  QA_URL="https://trangchu.vanlang.biz/"
-fi
+# NORMAL DEPLOY: HTTPS đã có sẵn (Certbot đã cấu hình) -> ưu tiên test https
+QA_URL="https://trangchu.vanlang.biz/"
 
 # HTTP status check
 set +e
@@ -333,18 +226,16 @@ else
   $SSH "getent hosts trangchu.vanlang.biz 2>&1 | head -5 || host trangchu.vanlang.biz 2>&1 | head -5 || true"
 fi
 
-# HTTPS probe if cert exists
-if [ "$HTTPS_RESULT" = "PASS" ]; then
-  set +e
-  HTTPS_CODE=$($SSH "curl -fsSI https://trangchu.vanlang.biz/ 2>&1 | head -1 | grep -oE '[0-9]{3}' | head -1" | tr -d '\r' | xargs)
-  set -e
-  if echo "$HTTPS_CODE" | grep -qE '^(200|301|302)$'; then
-    HTTPS_RESULT="PASS"
-    ok "HTTPS https://trangchu.vanlang.biz/ -> $HTTPS_CODE"
-  else
-    HTTPS_RESULT="FAIL"
-    warn "HTTPS probe -> ${HTTPS_CODE:-no response}"
-  fi
+# HTTPS probe (NORMAL DEPLOY: chỉ report, không sửa)
+set +e
+HTTPS_CODE=$($SSH "curl -fsSI https://trangchu.vanlang.biz/ 2>&1 | head -1 | grep -oE '[0-9]{3}' | head -1" | tr -d '\r' | xargs)
+set -e
+if echo "$HTTPS_CODE" | grep -qE '^(200|301|302)$'; then
+  HTTPS_RESULT="PASS"
+  ok "HTTPS https://trangchu.vanlang.biz/ -> $HTTPS_CODE"
+else
+  HTTPS_RESULT="FAIL"
+  warn "HTTPS https://trangchu.vanlang.biz/ -> ${HTTPS_CODE:-no response} (CHỈ REPORT, không chạy Certbot)"
 fi
 
 # Asset checks (via local index.html to avoid hardcoding wrong filenames)
@@ -395,11 +286,11 @@ for asset in $(echo "$BODY" | grep -oE '(href|src)="[^"]+\.(css|js|png|jpg|jpeg|
 done
 
 # ============================================================
-# [10/10] Game safety check (no restart)
+# [8/8] Game safety check (no restart)
 # ============================================================
 echo ""
 echo "============================================================"
-echo "[10/10] Game safety check (read-only, no restart)"
+echo "[8/8] Game safety check (read-only, no restart)"
 echo "============================================================"
 
 $SSH bash -s <<'EOS'
