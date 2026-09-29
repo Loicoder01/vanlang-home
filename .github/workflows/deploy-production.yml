@@ -63,11 +63,21 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.VANLANG_VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VANLANG_VPS_HOST }}
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
-          echo "${{ secrets.VANLANG_VPS_SSH_KEY }}" > ~/.ssh/vanlang_vps_ed25519
+          test -n "$SSH_KEY" || (echo "Missing VANLANG_VPS_SSH_KEY secret" && exit 1)
+          test -n "$VPS_HOST" || (echo "Missing VANLANG_VPS_HOST secret" && exit 1)
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/vanlang_vps_ed25519
           chmod 600 ~/.ssh/vanlang_vps_ed25519
-          ssh-keyscan -H "${{ secrets.VANLANG_VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          if ! ssh-keygen -y -f ~/.ssh/vanlang_vps_ed25519 >/dev/null 2>&1; then
+            echo "Invalid VANLANG_VPS_SSH_KEY format. Re-save the full private key including BEGIN/END lines."
+            exit 1
+          fi
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy (rsync + nginx -t + reload + healthcheck + rollback)
         env:
