@@ -1021,3 +1021,24 @@ body[data-auth="guest"] .auth-only-play{display:none !important}
 .form-error{color:#d66;font-size:12px;margin-bottom:8px}
 .form-links{font-size:12px;margin-top:10px;color:var(--text-dim)}
 .profile-card{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--bg-panel)}
+
+/* BXH + Community mock polish */
+.rank-table{overflow:auto}
+.rank-table table{width:100%;border-collapse:collapse;font-size:13px}
+.rank-table th,.rank-table td{padding:8px 10px;border-bottom:1px solid var(--line-faint);text-align:left}
+.rank-top1 td{color:var(--gold);font-weight:700}
+.chat-messages{max-height:360px;overflow:auto;border:1px solid var(--line-faint);border-radius:6px;padding:10px;background:var(--bg-deep)}
+.chat-msg{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-faint)}
+.chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);color:#0D1410;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex:0 0 32px}
+.chat-body{flex:1}
+.chat-meta{font-size:11px;color:var(--text-dim);font-weight:400}
+.chat-actions{margin-top:6px;display:flex;gap:6px}
+.chat-actions[hidden]{display:none !important}
+.chat-actions button{font-size:11px;padding:4px 8px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--text-dim)}
+.community-layout{display:grid;grid-template-columns:180px 1fr 180px;gap:12px}
+.chat-channels{display:flex;flex-direction:column;gap:4px}
+.chat-channel{padding:8px 10px;text-align:left;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text-dim);cursor:pointer}
+.chat-channel.is-active{background:rgba(201,162,77,.10);border-color:var(--line);color:var(--gold)}
+.chat-input{display:flex;gap:8px;margin-top:10px}
+.chat-input input{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg-deep);color:var(--text)}
+@media (max-width: 900px){.community-layout{grid-template-columns:1fr}.chat-channels{flex-direction:row;overflow:auto}}

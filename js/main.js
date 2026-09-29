@@ -277,6 +277,93 @@
     window.addEventListener('vanlang:authchange', applyAuthUI);
     applyAuthUI();
   }
+
+  function wireRankingCommunityChat(){
+    // Ranking: render top 10 từ data/rankings.json (mock)
+    var rankPanel=document.getElementById('rankPanel');
+    var myRankEl=document.getElementById('myRank');
+    if(rankPanel){
+      fetch('data/rankings.json').then(function(r){return r.json();}).then(function(data){
+        var list=data.topLevel||[];
+        var html='<div class="rank-table"><table><thead><tr><th>Hạng</th><th>Nhân vật</th><th>Hệ</th><th>Lv</th><th>Giá trị</th></tr></thead><tbody>';
+        list.forEach(function(row,i){
+          var cls=i<3?'rank-top'+(i+1):'';
+          html+='<tr class="'+cls+'"><td>'+row.rank+'</td><td><span class="rank-name">'+row.name+'</span> <span class="badge-demo">DEMO</span></td><td>'+row.className+'</td><td>'+row.level+'</td><td>'+row.value+'</td></tr>';
+        });
+        html+='</tbody></table></div><p class="rank-note"><span class="badge-demo">DỮ LIỆU DEMO</span> — lấy từ nhân vật game khi có API.</p>';
+        rankPanel.innerHTML=html;
+        if(myRankEl && data.myRank){
+          myRankEl.innerHTML='<div class="my-rank-card"><strong>Hạng của bạn</strong> #'+data.myRank.rank+' · '+data.myRank.name+' · Lv.'+data.myRank.level+' <span class="badge-demo">DEMO</span></div>';
+        }
+      }).catch(function(){ if(rankPanel) rankPanel.innerHTML='<p>Không tải được BXH (DEMO).</p>'; });
+      // tabs
+      document.querySelectorAll('.rank-tab').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          document.querySelectorAll('.rank-tab').forEach(function(b){b.classList.remove('is-active')});
+          btn.classList.add('is-active');
+        });
+      });
+    }
+    // Community posts
+    var postsEl=document.getElementById('chatMessages');
+    // reuse same element for chat messages also (if rankings uses rankPanel, chat uses chatMessages)
+    // Actually community posts vs chat messages: keep chatMessages for chat, community posts elsewhere
+    // Render chat messages (mock) with member profile trigger
+    var chatBox=document.getElementById('chatMessages');
+    var channelsEl=document.getElementById('chatChannels');
+    var membersEl=document.getElementById('chatMembers');
+    if(chatBox){
+      function renderChat(data){
+        if(channelsEl){
+          channelsEl.innerHTML=data.channels.map(function(ch,i){return '<button class="chat-channel'+(i===0?' is-active':'')+'">'+ch+'</button>';}).join('');
+        }
+        chatBox.innerHTML=data.messages.map(function(m){
+          return '<div class="chat-msg" data-user="'+m.author+'"><span class="chat-avatar">'+m.author.slice(0,2).toUpperCase()+'</span><div class="chat-body"><strong>'+m.author+' <span class="chat-meta">Lv.'+m.level+' · '+m.className+' · '+m.time+'</span> <span class="badge-demo">DEMO</span></strong><p>'+m.content+'</p><button class="chat-more" aria-label="Tùy chọn">...</button><div class="chat-actions" hidden><button data-act="copy">Copy tin nhắn</button><button data-act="report">Báo cáo</button><button data-act="block">Chặn</button></div></div></div>';
+        }).join('');
+        chatBox.querySelectorAll('.chat-more').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            var acts=btn.nextElementSibling;
+            if(acts) acts.hidden=!acts.hidden;
+          });
+        });
+        chatBox.querySelectorAll('[data-act="copy"]').forEach(function(b){
+          b.addEventListener('click', function(){
+            var p=b.closest('.chat-body').querySelector('p');
+            if(p) navigator.clipboard.writeText(p.textContent).catch(function(){});
+            b.closest('.chat-actions').hidden=true;
+          });
+        });
+        // member click -> mini profile (mock)
+        chatBox.querySelectorAll('.chat-avatar').forEach(function(av){
+          av.style.cursor='pointer';
+          av.addEventListener('click', function(){
+            alert('Hồ sơ: '+av.parentElement.dataset.user+' — Xem hồ sơ / Kết bạn (SẮP CẬP NHẬT) / Nhắn tin (SẮP CẬP NHẬT)');
+          });
+        });
+      }
+      fetch('data/community-chat.json').then(function(r){return r.json();}).then(renderChat).catch(function(){ chatBox.innerHTML='<p class="badge-demo">DEMO FRONTEND</p>'; });
+      // local send (mock, no WebSocket)
+      var input=document.getElementById('chatText');
+      var send=document.getElementById('chatSend');
+      function sendMock(){
+        if(!input || !input.value.trim()) return;
+        var auth=window.VanLangAuth;
+        var main=auth && auth.getMainCharacter();
+        var author=main ? main.name : 'Khách';
+        var lev=main ? main.level : '?';
+        var cls=main ? main.className : '?';
+        var el=document.createElement('div');
+        el.className='chat-msg';
+        el.innerHTML='<span class="chat-avatar">'+author.slice(0,2).toUpperCase()+'</span><div class="chat-body"><strong>'+author+' <span class="chat-meta">Lv.'+lev+' · '+cls+' · vừa xong</span> <span class="badge-demo">DEMO</span></strong><p>'+input.value+'</p></div></div>';
+        chatBox.appendChild(el);
+        chatBox.scrollTop=chatBox.scrollHeight;
+        input.value='';
+      }
+      if(send) send.addEventListener('click', sendMock);
+      if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') sendMock(); });
+    }
+  }
+
   function wireProfileRankingCommunity(){
     // Profile card (mock)
     var pc=document.getElementById('profileCard');
