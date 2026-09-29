@@ -1,0 +1,88 @@
+{
+  "_note": "DỮ LIỆU DEMO — không phải ranking thật",
+  "tabs": [
+    "TOP LEVEL",
+    "TOP LỰC CHIẾN",
+    "TOP TRANG BỊ",
+    "TOP BOSS",
+    "TOP THÀNH TỰU"
+  ],
+  "topLevel": [
+    {
+      "rank": 1,
+      "name": "Hùng Vương",
+      "className": "Lạc Vệ",
+      "level": 50,
+      "value": 50
+    },
+    {
+      "rank": 2,
+      "name": "Sơn Tinh",
+      "className": "Trúc Vệ",
+      "level": 48,
+      "value": 48
+    },
+    {
+      "rank": 3,
+      "name": "Vân Ưng",
+      "className": "Lạc Vũ",
+      "level": 47,
+      "value": 47
+    },
+    {
+      "rank": 4,
+      "name": "Lạc Long",
+      "className": "Lạc Vệ",
+      "level": 45,
+      "value": 45
+    },
+    {
+      "rank": 5,
+      "name": "Âu Cơ",
+      "className": "Lạc Vũ",
+      "level": 44,
+      "value": 44
+    },
+    {
+      "rank": 6,
+      "name": "Thủy Tinh",
+      "className": "Trúc Vệ",
+      "level": 42,
+      "value": 42
+    },
+    {
+      "rank": 7,
+      "name": "Đồng Lư",
+      "className": "Lạc Vệ",
+      "level": 40,
+      "value": 40
+    },
+    {
+      "rank": 8,
+      "name": "Bà Chợ",
+      "className": "Trúc Vệ",
+      "level": 38,
+      "value": 38
+    },
+    {
+      "rank": 9,
+      "name": "Lạc An",
+      "className": "Lạc Vệ",
+      "level": 36,
+      "value": 36
+    },
+    {
+      "rank": 10,
+      "name": "Thanh Mộc",
+      "className": "Trúc Vệ",
+      "level": 35,
+      "value": 35
+    }
+  ],
+  "myRank": {
+    "rank": 128,
+    "name": "LạcLong01",
+    "className": "Lạc Vệ",
+    "level": 35
+  }
+}

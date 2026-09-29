@@ -1,0 +1,24 @@
+{
+  "_note": "DEMO",
+  "posts": [
+    {
+      "id": 1,
+      "author": "Lạc Long",
+      "level": 35,
+      "className": "Lạc Vệ",
+      "title": "Tối nay săn boss Phong Châu?",
+      "excerpt": "Tập trung cổng làng lúc 20:00 — party 5 người.",
+      "date": "2026-09-30"
+    },
+    {
+      "id": 2,
+      "author": "Vân Ưng",
+      "level": 28,
+      "className": "Lạc Vũ",
+      "title": "Mẹo chọn hệ phái tân thủ",
+      "excerpt": "Rìu trâu, Cung cơ động, Gậy tre liên hoàn — chọn theo nhịp đánh bạn thích.",
+      "date": "2026-09-29"
+    }
+  ],
+  "members": 1240
+}

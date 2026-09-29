@@ -28,7 +28,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Text:ital,wght@0,600;0,700;1,600&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-auth="guest">
 <a class="skip-link" href="#hero">Bỏ qua điều hướng</a>
 
 <!-- ===== TOP BAR ===== -->
@@ -58,7 +58,26 @@
     </nav>
     <div class="topbar-actions">
       <span class="version-badge" id="versionBadge">V0.6</span>
-      <a class="btn btn-play btn-play-sm" id="playBtnTop" href="#" rel="noopener">CHƠI NGAY</a>
+      <div class="auth-guest" id="authGuest">
+        <button class="btn btn-ghost btn-sm" id="btnLogin" type="button">ĐĂNG NHẬP</button>
+        <button class="btn btn-play btn-play-sm" id="btnRegister" type="button">ĐĂNG KÝ</button>
+      </div>
+      <div class="auth-logged" id="authLogged" hidden>
+        <button class="user-chip" id="userChip" type="button" aria-expanded="false" aria-controls="userDropdown">
+          <span class="user-avatar" id="userAvatar">LL</span>
+          <span class="user-name" id="userName">Lạc Long</span>
+          <span aria-hidden="true">▼</span>
+        </button>
+        <div class="user-dropdown" id="userDropdown" hidden role="menu">
+          <a href="#profile" role="menuitem">Hồ sơ của tôi</a>
+          <a href="#nhan-vat" role="menuitem">Nhân vật của tôi</a>
+          <a href="#rankings" role="menuitem">BXH của tôi</a>
+          <a href="#community" role="menuitem">Tin nhắn</a>
+          <a href="#cta" role="menuitem">Cài đặt</a>
+          <button type="button" id="btnLogout" role="menuitem">Đăng xuất</button>
+        </div>
+      </div>
+      <a class="btn btn-play btn-play-sm auth-only-play" id="playBtnTop" href="#" rel="noopener" hidden>CHƠI NGAY</a>
       <button class="nav-toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -73,7 +92,11 @@
     <a href="#tin-tuc">Tin tức</a>
     <a href="#huong-dan">Hướng dẫn</a>
     <a href="#cong-dong">Cộng đồng</a>
-    <a class="btn btn-play" id="playBtnMobile" href="#" rel="noopener">CHƠI NGAY — MIỄN PHÍ</a>
+    <div class="mobile-auth-guest" id="mobileAuthGuest">
+    <button class="btn btn-ghost" id="btnLoginMobile" type="button">ĐĂNG NHẬP</button>
+    <button class="btn btn-play" id="btnRegisterMobile" type="button">ĐĂNG KÝ</button>
+    </div>
+    <a class="btn btn-play auth-only-play" id="playBtnMobile" href="#" rel="noopener" hidden>CHƠI NGAY — MIỄN PHÍ</a>
   </div>
 </header>
 
@@ -573,7 +596,74 @@
   </div>
 </footer>
 
+
+<!-- ===== AUTH MODALS (MOCK frontend only) ===== -->
+<div class="modal-overlay" id="loginOverlay" hidden></div>
+<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle" hidden>
+  <button class="modal-close" type="button" aria-label="Đóng" data-close="loginModal">×</button>
+  <h2 id="loginTitle">ĐĂNG NHẬP VĂN LANG</h2>
+  <p class="modal-note">Tài khoản Văn Lang dùng chung cho trang chủ và game (account_id). <span class="badge-demo">DEMO FRONTEND</span></p>
+  <form id="loginForm" novalidate>
+    <label>Tên tài khoản / Email <input type="text" id="loginUser" autocomplete="username" required></label>
+    <label>Mật khẩu <input type="password" id="loginPass" autocomplete="current-password" required></label>
+    <label class="check"><input type="checkbox" id="loginRemember"> Ghi nhớ đăng nhập</label>
+    <div class="form-error" id="loginError" role="alert" hidden></div>
+    <button class="btn btn-play" type="submit" style="width:100%">ĐĂNG NHẬP</button>
+    <p class="form-links"><a href="#" id="linkForgot">Quên mật khẩu?</a> · <a href="#" id="linkToRegister">Chưa có tài khoản? Đăng ký</a></p>
+    <p class="form-links"><span class="badge-soon">SẮP CẬP NHẬT</span> Đăng nhập Google</p>
+  </form>
+</div>
+<div class="modal" id="registerModal" role="dialog" aria-modal="true" aria-labelledby="registerTitle" hidden>
+  <button class="modal-close" type="button" aria-label="Đóng" data-close="registerModal">×</button>
+  <h2 id="registerTitle">TẠO TÀI KHOẢN VĂN LANG</h2>
+  <p class="modal-note">Tài khoản này dùng chung cho trang chủ và game. <span class="badge-demo">DEMO FRONTEND</span></p>
+  <form id="registerForm" novalidate>
+    <label>Tên tài khoản <input type="text" id="regUser" required></label>
+    <label>Email <input type="email" id="regEmail" required></label>
+    <label>Mật khẩu <input type="password" id="regPass" required></label>
+    <label>Nhập lại mật khẩu <input type="password" id="regPass2" required></label>
+    <label class="check"><input type="checkbox" id="regAgree" required> Tôi đồng ý với Điều khoản sử dụng.</label>
+    <div class="form-error" id="registerError" role="alert" hidden></div>
+    <button class="btn btn-play" type="submit" style="width:100%">TẠO TÀI KHOẢN</button>
+    <p class="form-links"><a href="#" id="linkToLogin">Đã có tài khoản? Đăng nhập</a></p>
+  </form>
+</div>
+
+<!-- Guarded sections (hidden until loggedInDemo) -->
+<section class="section section-profile" id="profile" hidden>
+  <div class="container">
+    <div class="section-head"><p class="section-kicker">Hồ sơ</p><h2 class="section-title">HỒ SƠ <span class="accent">VĂN LANG</span></h2><p class="section-lead"><span class="badge-demo">DEMO DATA</span> — 1 USER = 1 account_id, dùng chung homepage + game.</p></div>
+    <div class="profile-card" id="profileCard"><p>Đang tải hồ sơ...</p></div>
+  </div>
+</section>
+<section class="section section-rankings" id="rankings" hidden>
+  <div class="container">
+    <div class="section-head"><p class="section-kicker">Bảng xếp hạng</p><h2 class="section-title">ANH HÙNG <span class="accent">VĂN LANG</span></h2><p class="section-lead">Top 10 theo game data. <span class="badge-demo">DỮ LIỆU DEMO</span></p></div>
+    <div class="rank-tabs" role="tablist"><button class="rank-tab is-active" data-rank="topLevel">TOP LEVEL</button><button class="rank-tab" data-rank="topPower">TOP LỰC CHIẾN</button></div>
+    <div class="rank-panel" id="rankPanel"><p>Đang tải BXH...</p></div>
+    <div class="my-rank" id="myRank"></div>
+    <p><a href="#rankings" class="btn btn-ghost">XEM TOÀN BỘ BXH</a> <span class="badge-soon">SẮP RA MẮT</span></p>
+  </div>
+</section>
+<section class="section section-community" id="community" hidden>
+  <div class="container">
+    <div class="section-head"><p class="section-kicker">Cộng đồng</p><h2 class="section-title">CỘNG ĐỒNG <span class="accent">VĂN LANG</span></h2><p class="section-lead">Chat cộng đồng theo account_id + main character. <span class="badge-demo">DEMO FRONTEND</span></p></div>
+    <div class="community-layout">
+      <aside class="chat-channels" id="chatChannels"></aside>
+      <div class="chat-main">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input" id="chatInput"><input type="text" id="chatText" placeholder="Nhập tin nhắn..."><button id="chatSend">Gửi</button></div>
+      </div>
+      <aside class="chat-members" id="chatMembers">Online — DEMO</aside>
+    </div>
+  </div>
+</section>
+
 <script src="js/config.js"></script>
+<script src="js/services/auth.service.js"></script>
+<script src="js/services/ranking.service.js"></script>
+<script src="js/services/community.service.js"></script>
+<script src="js/services/chat.service.js"></script>
 <script src="js/atlas.js"></script>
 <script src="js/main.js"></script>
 </body>

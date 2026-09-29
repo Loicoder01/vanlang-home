@@ -996,3 +996,28 @@ a:focus-visible, button:focus-visible {
 
 body.nav-open{overflow:hidden}
 .mobile-nav{max-height:calc(100vh - 56px);overflow:auto}
+
+/* Auth: guest vs logged */
+.auth-guest{display:flex;gap:8px;align-items:center}
+.auth-logged{position:relative}
+.user-chip{display:flex;align-items:center;gap:8px;background:rgba(201,162,77,.10);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer;color:var(--gold)}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--gold);color:#0D1410;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.user-dropdown{position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:var(--bg-panel);border:1px solid var(--line);border-radius:4px;padding:6px;box-shadow:0 12px 28px rgba(0,0,0,.45);z-index:30}
+.user-dropdown a,.user-dropdown button{display:block;width:100%;text-align:left;padding:8px 10px;font-size:13px;color:var(--text-dim);background:none;border:none;cursor:pointer;border-radius:2px}
+.user-dropdown a:hover,.user-dropdown button:hover{background:rgba(201,162,77,.10);color:var(--gold)}
+body[data-auth="guest"] .auth-only-play{display:none !important}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;padding:24px;z-index:41;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.modal-close{position:absolute;right:10px;top:8px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-dim)}
+.modal h2{font-size:18px;color:var(--gold);margin-bottom:6px}
+.modal-note{font-size:12px;color:var(--text-dim);margin-bottom:14px}
+.badge-demo{font-size:10px;padding:2px 6px;background:rgba(201,162,77,.15);border:1px solid var(--line);border-radius:2px;color:var(--gold)}
+.badge-soon{font-size:10px;padding:2px 6px;border:1px dashed var(--line);color:var(--text-dim);border-radius:2px}
+.modal label{display:flex;flex-direction:column;gap:4px;font-size:13px;margin-bottom:10px}
+.modal input[type="text"],.modal input[type="password"],.modal input[type="email"]{padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg-deep);color:var(--text)}
+.modal .check{flex-direction:row;align-items:center}
+.form-error{color:#d66;font-size:12px;margin-bottom:8px}
+.form-links{font-size:12px;margin-top:10px;color:var(--text-dim)}
+.profile-card{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--bg-panel)}

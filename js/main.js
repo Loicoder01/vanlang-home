@@ -145,6 +145,150 @@
     update();
   }
 
+
+  // ==== Auth (MOCK frontend): guest / loggedInDemo via sessionStorage ====
+  function applyAuthUI(){
+    var logged = window.VanLangAuth && window.VanLangAuth.isLoggedIn();
+    document.body.setAttribute('data-auth', logged ? 'logged' : 'guest');
+    var guestEls = document.querySelectorAll('#authGuest, #mobileAuthGuest');
+    var loggedEls = document.querySelectorAll('#authLogged');
+    var playEls = document.querySelectorAll('.auth-only-play');
+    guestEls.forEach(function(el){ el.hidden = !!logged; });
+    loggedEls.forEach(function(el){ el.hidden = !logged; });
+    playEls.forEach(function(el){ el.hidden = !logged; });
+    // guarded sections
+    ['profile','rankings','community'].forEach(function(id){
+      var sec=document.getElementById(id);
+      if(sec) sec.hidden = !logged;
+    });
+    if(logged){
+      var main = window.VanLangAuth.getMainCharacter();
+      var acc = window.VanLangAuth.getAccount();
+      var nameEl=document.getElementById('userName');
+      var avEl=document.getElementById('userAvatar');
+      if(nameEl && acc) nameEl.textContent = acc.displayName || acc.username;
+      if(avEl && acc) avEl.textContent = acc.avatarSeed || 'VL';
+      // hero CTA swap: logged shows CHƠI NGAY, guest shows ĐĂNG NHẬP
+      var heroPlay=document.getElementById('playBtnHero');
+      if(heroPlay) heroPlay.textContent = logged ? '▶ CHƠI NGAY' : 'ĐĂNG NHẬP ĐỂ CHƠI';
+    }
+  }
+  function wireAuth(){
+    var loginOverlay=document.getElementById('loginOverlay');
+    var loginModal=document.getElementById('loginModal');
+    var registerModal=document.getElementById('registerModal');
+    function openModal(id){
+      var m=document.getElementById(id);
+      if(!m) return;
+      m.hidden=false; if(loginOverlay) loginOverlay.hidden=false;
+      document.body.style.overflow='hidden';
+      var first=m.querySelector('input'); if(first) first.focus();
+    }
+    function closeModals(){
+      [loginModal, registerModal].forEach(function(m){ if(m) m.hidden=true; });
+      if(loginOverlay) loginOverlay.hidden=true;
+      document.body.style.overflow='';
+    }
+    window.VanLangOpenLogin = function(){ openModal('loginModal'); };
+    window.VanLangOpenRegister = function(){ openModal('registerModal'); };
+    // Route guard
+    window.VanLangGuard = function(hash){
+      if(!window.VanLangAuth || !window.VanLangAuth.isLoggedIn()){
+        openModal('loginModal');
+        return false;
+      }
+      return true;
+    };
+    // Bind buttons
+    ['btnLogin','btnLoginMobile'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.addEventListener('click', function(){ openModal('loginModal'); });
+    });
+    ['btnRegister','btnRegisterMobile'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.addEventListener('click', function(){ openModal('registerModal'); });
+    });
+    var linkToReg=document.getElementById('linkToRegister');
+    if(linkToReg) linkToReg.addEventListener('click', function(e){ e.preventDefault(); closeModals(); setTimeout(function(){ openModal('registerModal'); },80); });
+    var linkToLog=document.getElementById('linkToLogin');
+    if(linkToLog) linkToLog.addEventListener('click', function(e){ e.preventDefault(); closeModals(); setTimeout(function(){ openModal('loginModal'); },80); });
+    document.querySelectorAll('[data-close]').forEach(function(btn){
+      btn.addEventListener('click', closeModals);
+    });
+    if(loginOverlay) loginOverlay.addEventListener('click', closeModals);
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModals(); });
+
+    // Forms (mock)
+    var loginForm=document.getElementById('loginForm');
+    if(loginForm) loginForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var u=document.getElementById('loginUser').value.trim();
+      var pw=document.getElementById('loginPass').value;
+      var res=window.VanLangAuth.loginDemo(u,pw);
+      var err=document.getElementById('loginError');
+      if(!res.ok){ err.textContent=res.error; err.hidden=false; return; }
+      err.hidden=true; closeModals(); applyAuthUI();
+    });
+    var regForm=document.getElementById('registerForm');
+    if(regForm) regForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var u=document.getElementById('regUser').value.trim();
+      var em=document.getElementById('regEmail').value.trim();
+      var pw=document.getElementById('regPass').value;
+      var pw2=document.getElementById('regPass2').value;
+      var res=window.VanLangAuth.registerDemo(u,em,pw,pw2);
+      var err=document.getElementById('registerError');
+      if(!res.ok){ err.textContent=res.error; err.hidden=false; return; }
+      err.hidden=true; closeModals(); applyAuthUI();
+    });
+    // Logout
+    var btnOut=document.getElementById('btnLogout');
+    if(btnOut) btnOut.addEventListener('click', function(){ window.VanLangAuth.logout(); applyAuthUI(); });
+    // User chip dropdown
+    var chip=document.getElementById('userChip');
+    var drop=document.getElementById('userDropdown');
+    if(chip && drop){
+      chip.addEventListener('click', function(){
+        var open=chip.getAttribute('aria-expanded')==='true';
+        chip.setAttribute('aria-expanded', open?'false':'true');
+        drop.hidden=open;
+      });
+      document.addEventListener('click', function(e){
+        if(!chip.contains(e.target) && !drop.contains(e.target)){ chip.setAttribute('aria-expanded','false'); drop.hidden=true; }
+      });
+    }
+    // Guard hash links: #play #rankings #community #profile
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      var href=a.getAttribute('href');
+      if(['#play','#rankings','#community','#profile','#messages'].indexOf(href)===-1) return;
+      a.addEventListener('click', function(ev){
+        if(!window.VanLangAuth.isLoggedIn()){
+          ev.preventDefault(); openModal('loginModal');
+        }
+      });
+    });
+    // Play buttons guard
+    ['playBtnTop','playBtnHero','playBtnPlay','playBtnCta','playBtnMobile'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('click', function(ev){
+        if(!window.VanLangAuth.isLoggedIn()){ ev.preventDefault(); openModal('loginModal'); }
+      }, true);
+    });
+    // React to auth change
+    window.addEventListener('vanlang:authchange', applyAuthUI);
+    applyAuthUI();
+  }
+  function wireProfileRankingCommunity(){
+    // Profile card (mock)
+    var pc=document.getElementById('profileCard');
+    if(pc && window.VanLangAuth){
+      var acc=window.VanLangAuth.getAccount();
+      var main=window.VanLangAuth.getMainCharacter();
+      if(acc && main){
+        pc.innerHTML='<div class="profile-row"><strong>'+acc.displayName+'</strong> · account_id '+acc.account_id+'<br>Nhân vật chính: '+main.name+' · Lv.'+main.level+' · '+main.className+'<br><span class="badge-demo">DEMO DATA</span> — không phải dữ liệu thật</div>';
+      }
+    }
+  }
+
   // Mobile nav
   function wireMobileNav() {
     var toggle = document.getElementById("navToggle");
@@ -325,6 +469,8 @@
     wireKeyboardTabs();
     wireSmoothScroll();
     wireExploreMenu();
+    wireAuth();
+    wireProfileRankingCommunity();
     wireMobileNav();
     wireTopbarScroll();
   });

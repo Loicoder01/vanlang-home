@@ -1,0 +1,62 @@
+{
+  "_note": "DEMO FRONTEND — không realtime",
+  "channels": [
+    "# Thế giới",
+    "# Tân thủ",
+    "# Tìm đội",
+    "# Boss",
+    "# Giao dịch",
+    "# Bang hội",
+    "# Khoảnh khắc"
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "author": "HùngVương",
+      "level": 35,
+      "className": "Lạc Vệ",
+      "time": "20:02",
+      "content": "Anh em tối nay săn boss Phong Châu không?"
+    },
+    {
+      "id": 2,
+      "author": "Vân Ưng",
+      "level": 28,
+      "className": "Lạc Vũ",
+      "time": "20:03",
+      "content": "Mình tham gia, party còn slot không?"
+    },
+    {
+      "id": 3,
+      "author": "Trúc Phong",
+      "level": 22,
+      "className": "Trúc Vệ",
+      "time": "20:04",
+      "content": "Còn 2 slot, qua cổng làng nhé!"
+    },
+    {
+      "id": 4,
+      "author": "Đồng Lư",
+      "level": 40,
+      "className": "Lạc Vệ",
+      "time": "20:05",
+      "content": "Nhớ ghé lò rèn trước khi đi boss — cường hóa +3 free."
+    },
+    {
+      "id": 5,
+      "author": "Bà Chợ",
+      "level": 18,
+      "className": "Trúc Vệ",
+      "time": "20:06",
+      "content": "Chợ có đợt trang bị mới, ghé xem nhé!"
+    },
+    {
+      "id": 6,
+      "author": "Lạc An",
+      "level": 36,
+      "className": "Lạc Vệ",
+      "time": "20:07",
+      "content": "Tân thủ nhớ làm nhiệm vụ Già làng trước nhé."
+    }
+  ]
+}
