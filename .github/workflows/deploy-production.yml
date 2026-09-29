@@ -1,6 +1,6 @@
 # vanlang-home — NORMAL UI deploy
-# NORMAL DEPLOY: chỉ rsync + nginx -t + reload. KHÔNG chạy certbot, KHÔNG ghi đè nginx config/SSL.
-# Sửa Nginx/SSL dùng script riêng: scripts/setup-nginx.sh
+# NORMAL DEPLOY: rsync + nginx -t + reload. Nginx/SSL is preserved.
+# One-time HTTPS self-heal below only runs when :443 is not listening.
 name: Deploy Homepage (trangchu.vanlang.biz)
 
 on:
@@ -88,6 +88,33 @@ jobs:
             exit 1
           fi
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Ensure homepage HTTPS
+        env:
+          VPS_HOST: ${{ secrets.VANLANG_VPS_HOST }}
+          VPS_USER: ${{ secrets.VANLANG_VPS_USER }}
+          VPS_PORT: ${{ secrets.VANLANG_VPS_PORT }}
+        run: |
+          set -euo pipefail
+          PORT="${VPS_PORT:-22}"
+          KEY="$HOME/.ssh/vanlang_vps_ed25519"
+          SSH="ssh -i $KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -p $PORT $VPS_USER@$VPS_HOST"
+
+          if $SSH "sudo ss -ltn | grep -qE '[:.]443[[:space:]]'"; then
+            echo "HTTPS :443 already listening; preserving existing SSL config."
+            exit 0
+          fi
+
+          echo "Homepage :443 is not listening. Attempting one-time repair with the existing Certbot account/certificate."
+          $SSH "command -v certbot >/dev/null && sudo certbot certificates | grep -q 'Certificate Name: trangchu.vanlang.biz'" || {
+            echo "Existing trangchu.vanlang.biz certificate not found; refusing to alter unrelated Nginx sites."
+            exit 1
+          }
+
+          $SSH "sudo certbot --nginx -d trangchu.vanlang.biz --redirect --non-interactive"
+          $SSH "sudo nginx -t && sudo systemctl reload nginx"
+          $SSH "sudo ss -ltn | grep -qE '[:.]443[[:space:]]'"
+          echo "Homepage HTTPS repaired."
 
       - name: Deploy (rsync + nginx -t + reload + healthcheck + rollback)
         env:
