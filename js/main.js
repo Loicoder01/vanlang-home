@@ -7,6 +7,8 @@
   var GAME_URL = (cfg.GAME_URL || "").trim();
   var VERSION  = cfg.VERSION || "V0.6";
 
+  var HOME_VERSION = (cfg.HOME_VERSION || cfg.VERSION || "v0.1.0");
+  var GAME_VERSION = (cfg.GAME_VERSION || "V0.6");
   var isPlaceholder = !GAME_URL || GAME_URL.indexOf("game.vanlang.biz") !== -1;
 
   function openGame(ev) {
@@ -27,7 +29,9 @@
 
   function renderVersion() {
     var badge = document.getElementById("versionBadge");
-    if (badge) badge.textContent = VERSION.replace(" — chờ V0.6-STABLE", "");
+    if (badge) badge.textContent = GAME_VERSION.replace(" — chờ V0.6-STABLE", "");
+    var badgeHome = document.getElementById("homeVersionBadge");
+    if (badgeHome) badgeHome.textContent = HOME_VERSION;
 
     var ctaUrl = document.getElementById("ctaUrl");
     if (ctaUrl) {
@@ -151,10 +155,13 @@
       toggle.setAttribute("aria-expanded", open ? "false" : "true");
       nav.hidden = open;
     });
+    function syncBodyLock(){ document.body.classList.toggle('nav-open', toggle.getAttribute('aria-expanded')==='true'); }
+    toggle.addEventListener('click', function(){ setTimeout(syncBodyLock,0); });
     nav.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () {
         toggle.setAttribute("aria-expanded", "false");
         nav.hidden = true;
+        document.body.classList.remove('nav-open');
       });
     });
   }

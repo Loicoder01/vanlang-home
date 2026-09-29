@@ -4,5 +4,7 @@ window.VANLANG_CONFIG = {
   ADMIN_URL: "https://abeo.vanlang.biz",
   HOME_URL: "https://trangchu.vanlang.biz",
   STAGING_URL: "http://180.93.116.150",
+  HOME_VERSION: "v0.1.0",
+  GAME_VERSION: "V0.6",
   VERSION: "V0.6"
 };
