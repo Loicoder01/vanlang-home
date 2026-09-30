@@ -439,7 +439,7 @@
   function loadHeroBg() {
     var el = document.getElementById('heroBgPhoto');
     if (!el) return;
-    var url = 'assets/images/hero-bg.webp';
+    var url = 'assets/images/hero/hero-landscape.webp';
     var img = new Image();
     img.onload = function () { el.style.backgroundImage = 'url("' + url + '")'; el.classList.add('has-image'); };
     img.onerror = function () { /* giữ gradient */ };
