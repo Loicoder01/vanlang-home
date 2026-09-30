@@ -671,7 +671,12 @@ a:focus-visible, button:focus-visible {
 .play-note { margin-top: 12px; font-size: 13px; color: var(--text-dim); }
 
 /* ===== TÍNH NĂNG (Hoạt động) ===== */
-.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.feature-grid{display:none}
+.feature-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:18px 0;border-top:1px solid rgba(201,162,77,.14);border-bottom:1px solid rgba(201,162,77,.14);background:linear-gradient(180deg, rgba(20,26,24,.6), rgba(14,18,16,.9))}
+.feature-strip-item{text-align:center}
+.feature-strip-icon{display:block;font-size:22px;margin-bottom:6px;color:var(--gold)}
+.feature-strip-item strong{color:var(--gold-soft);font-size:13px}
+.feature-strip-item span{color:var(--text-dim);font-size:11px;display:block}
 .feature-card {
   padding: 26px 22px 20px;
   background: var(--bg-raised);
@@ -1109,3 +1114,5 @@ body{background:linear-gradient(180deg, #0D1410 0%, #0F1A14 50%, #0D1410 100%)}
 @media (max-width: 900px){.hero{min-height:72vh}.hero-layout{grid-template-columns:1fr;gap:18px}.hero-copy{max-width:100%}.hero-bg-photo{background-position:center 30%}}
 
 .hero{min-height:88vh}
+
+/* HERO CLEAN: hero-bg.webp must be landscape only (no baked UI). If missing, gradient+pattern shows. */
