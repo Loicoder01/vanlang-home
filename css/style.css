@@ -1084,3 +1084,15 @@ body{background:linear-gradient(180deg, #0D1410 0%, #0F1A14 50%, #0D1410 100%)}
 .footer{position:relative;overflow:hidden}
 .footer::before{content:"";position:absolute;top:10%;left:50%;transform:translateX(-50%);width:min(640px,90vw);height:min(640px,90vw);border-radius:50%;border:1px solid rgba(201,162,77,.06);pointer-events:none}
 .footer::after{content:"";position:absolute;top:12%;left:50%;transform:translateX(-50%);width:min(520px,80vw);height:min(520px,80vw);border-radius:50%;border:1px solid rgba(201,162,77,.04);pointer-events:none}
+
+/* Reference priority: CTA scarlet + feature strip + news cinematic */
+.btn-play.cta-scarlet{background: linear-gradient(180deg, #9B2C1A, #6B1A0F);border-color: #C9A24D;color:#FFF8E7;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.btn-play.cta-scarlet:hover{background: linear-gradient(180deg, #A8351F, #7A1E12)}
+.hero-bg{overflow:hidden}
+.hero-bg-photo{opacity:.18}
+.hero-bg-gradient{background: linear-gradient(90deg, rgba(10,14,12,.88) 0%, rgba(10,14,12,.45) 45%, rgba(10,14,12,.15) 70%, transparent 100%)}
+.hero-layout{gap:32px}
+.feature-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:18px 0;border-top:1px solid rgba(201,162,77,.14);border-bottom:1px solid rgba(201,162,77,.14);background: linear-gradient(180deg, rgba(20,26,24,.6), rgba(14,18,16,.9))}
+.feature-strip-item{text-align:center}
+.feature-strip-item strong{color:var(--gold-soft);font-size:13px}
+.feature-strip-item span{color:var(--text-dim);font-size:11px;display:block}
