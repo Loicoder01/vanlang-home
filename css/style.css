@@ -217,6 +217,7 @@ a:focus-visible, button:focus-visible {
 .eyebrow-line:last-child { transform: scaleX(-1); }
 
 .hero-title { line-height: 1; margin-bottom: 24px; }
+.hero-title-main-ref{font-size:clamp(48px,7vw,84px)}
 .hero-title-main {
   display: block;
   font-family: var(--font-title);
@@ -926,7 +927,8 @@ a:focus-visible, button:focus-visible {
 .footer-seal img{max-width:260px;height:auto;opacity:.92}
 
 /* When hero logo image loads, hide redundant H1 main but keep sub-lines */
-.hero--with-logo .hero-title-main{display:none}
+.hero--with-logo .hero-title-main-ref{font-size:clamp(48px,7vw,84px)}
+.hero-title-main{display:none}
 .hero--with-logo .hero-title-sub{margin-top:4px}
 
 /* Fallback: nếu JS không chạy, reveal tự hiện sau 1.8s (tránh invisible vĩnh viễn) */
@@ -1089,10 +1091,21 @@ body{background:linear-gradient(180deg, #0D1410 0%, #0F1A14 50%, #0D1410 100%)}
 .btn-play.cta-scarlet{background: linear-gradient(180deg, #9B2C1A, #6B1A0F);border-color: #C9A24D;color:#FFF8E7;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .btn-play.cta-scarlet:hover{background: linear-gradient(180deg, #A8351F, #7A1E12)}
 .hero-bg{overflow:hidden}
-.hero-bg-photo{opacity:.18}
-.hero-bg-gradient{background: linear-gradient(90deg, rgba(10,14,12,.88) 0%, rgba(10,14,12,.45) 45%, rgba(10,14,12,.15) 70%, transparent 100%)}
+.hero-bg-photo{position:absolute;inset:0;background-size:cover;background-position:center 38%;opacity:1}
+.hero-bg-gradient{position:absolute;inset:0;background:linear-gradient(90deg, rgba(8,12,10,.88) 0%, rgba(8,12,10,.72) 28%, rgba(8,12,10,.38) 52%, rgba(8,12,10,.08) 78%, transparent 100%)}
 .hero-layout{gap:32px}
 .feature-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:18px 0;border-top:1px solid rgba(201,162,77,.14);border-bottom:1px solid rgba(201,162,77,.14);background: linear-gradient(180deg, rgba(20,26,24,.6), rgba(14,18,16,.9))}
 .feature-strip-item{text-align:center}
 .feature-strip-item strong{color:var(--gold-soft);font-size:13px}
 .feature-strip-item span{color:var(--text-dim);font-size:11px;display:block}
+
+/* Rebuild hero: reference cinematic */
+.hero .hero-layout{position:relative;z-index:2;gap:24px;align-items:center}
+.hero-copy{max-width:560px}
+.hero-title-main{font-size:clamp(52px, 7.5vw, 88px);letter-spacing:.06em;text-shadow:0 4px 24px rgba(0,0,0,.6)}
+.hero-title-sub{font-size:clamp(11px,1.4vw,14px);letter-spacing:.38em;color:#E8D5A0}
+.hero-title-tera{font-size:clamp(10px,1.2vw,12px);letter-spacing:.32em;color:var(--bronze);margin-top:6px}
+.hero-tagline{font-size:clamp(14px,1.6vw,18px);max-width:520px}
+@media (max-width: 900px){.hero{min-height:72vh}.hero-layout{grid-template-columns:1fr;gap:18px}.hero-copy{max-width:100%}.hero-bg-photo{background-position:center 30%}}
+
+.hero{min-height:88vh}
